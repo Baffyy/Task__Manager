@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 
 function Register() {
@@ -8,15 +9,18 @@ function Register() {
         password:""
     })
 
+    const navigate=useNavigate();
+
     async function handleClick (event) {
+        event.preventDefault();
+
         try {
             await axios.post("http://localhost:3000/register", inputText)
         } catch(error) {
             console.error(error);
             res.status(501).send("Could not implement request")
         }
-
-        event.preventDefault();
+        navigate("/dashboard")
     }
 
     function handleChange(event) {

@@ -9,16 +9,19 @@ function Login() {
     })
 
     const navigate= useNavigate();
+    const navDash= useNavigate();
 
     async function handleClick (event) {
+        event.preventDefault();
+
         try {
             await axios.post("http://localhost:3000/login", inputText)
         } catch(error) {
             console.error(error);
             res.status(501).send("Could not implement request")
         }
+        navDash("/dashboard");
 
-        event.preventDefault();
     }
 
     function handleRegister() {
