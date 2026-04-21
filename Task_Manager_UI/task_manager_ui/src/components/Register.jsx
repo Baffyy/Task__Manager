@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 function Register() {
     const [inputText, setText] = useState({
-        email:"",
+        username:"",
         password:""
     })
 
@@ -18,7 +18,6 @@ function Register() {
             await axios.post("http://localhost:3000/register", inputText)
         } catch(error) {
             console.error(error);
-            res.status(501).send("Could not implement request")
         }
         navigate("/dashboard")
     }
@@ -38,7 +37,7 @@ function Register() {
                 <h2>Register</h2>
                 <div className="box">
                     <label htmlFor="email">Email</label>
-                    <input type="text" onChange={handleChange} name="email" id="email" value={inputText.email}/>
+                    <input type="text" onChange={handleChange} name="username" id="email" value={inputText.email}/>
                 </div>
                 <div className="box">
                     <label htmlFor="password">Password</label>

@@ -4,23 +4,27 @@ import axios from "axios";
 
 function Login() {
     const [inputText, setText] = useState({
-        email:"",
+        username:"",
         password:""
     })
 
     const navigate= useNavigate();
-    const navDash= useNavigate();
+
 
     async function handleClick (event) {
         event.preventDefault();
 
         try {
-            await axios.post("http://localhost:3000/login", inputText)
+          const result=  await axios.post("http://localhost:3000/login", inputText)
+            if (result) {
+                navigate("/dashboard");
+            } else {
+                return ("Wrong email or password")
+            }
         } catch(error) {
             console.error(error);
-            res.status(501).send("Could not implement request")
         }
-        navDash("/dashboard");
+        
 
     }
 
@@ -46,8 +50,8 @@ function Login() {
             <div className="login">
                 <h2>Sign In</h2>
                 <div className="login-box">
-                <label htmlFor="email">Email</label>
-                <input type="text" onChange={handleChange} name="email" id="email" value={inputText.email}/>
+                <label htmlFor="username">Email</label>
+                <input type="text" onChange={handleChange} name="username" id="username" value={inputText.username}/>
                 </div>
                 <div className="login-box">
                 <label htmlFor="password">Password</label>

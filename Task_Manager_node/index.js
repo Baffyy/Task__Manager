@@ -3,6 +3,7 @@ import pg from "pg";
 import axios from "axios";
 import bcrypt from "bcrypt";
 import env from "dotenv";
+import session from "express-session";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import cors from "cors";
@@ -24,8 +25,26 @@ const db = new pg.Client({
 db.connect();
 
 app.use(cors());
+app.use(express.json());
+app.use(session ({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24
+    }
+}))
 
+app.use(passport.initialize());
+app.use(passport.session())
 
+app.get("/dashboard", (req,res) => {
+    if(req.isAuthenticated()) {
+        res.json({ success: true })
+    } else {
+        res.redirect("/login")
+    }
+})
 
 app.post("/register", async(req,res) => {
     const email= req.body.email;
@@ -46,39 +65,58 @@ app.post("/register", async(req,res) => {
     }
 })
 
-app.post("/login", async(req,res) => {
-    const email= req.body.email;
-    const loginPassword = req.body.password;
+app.post("/login", passport.authenticate("local"), (req,res) => {
+    res.json({ success: true })
+})
 
+app.post("/dashboard", (req,res) => {
+    const title= req.body.title;
+    const description= req.body.description;
+    try {
+        const task= db.query("INSERT INTO tasks(title,description) VALUES($1,$2)",[title,description]);
+    } catch(err) {
+
+    }
+})
+
+passport.use(new Strategy(async function verify(username, password, cb) {
     try{
-        const result = await db.query("SELECT * FROM users WHERE email=$1",[email]);
+        const result = await db.query("SELECT * FROM users WHERE email=$1",[username]);
+        console.log(username)
 
         if (result.rows.length > 0) {
             const user = result.rows[0];
             const storedPassword = user.password; 
-            bcrypt.compare(loginPassword, storedPassword, async (err, result) => {
+            bcrypt.compare(password, storedPassword, async (err, result) => {
                 if(err) {
-                    console.log("Error comparing passwords", err)
+                    return cb(err)
                 } else {
                     if(result) {
-                        res.json({ success: true })
+                        return cb(null, user)
                     } else {
-                        res.send("Incorrect Password")
+                        return cb(null,false)
                     }
                 }
             } )
         } else {
-            res.send("user not found");
+            return cb("User not found")
         }
         
     } catch(err) {
         console.log(err);
     }
-   
-})
+}))
+
+passport.serializeUser((user,cb) => {
+    cb(null,user)
+});
+
+passport.deserializeUser((user,cb) => {
+    cb(null,user)
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
-})
+});
 
 
