@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import axios from "axios";
 import Items from "./Items";
 
 function Dashboard() {
@@ -7,6 +8,7 @@ function Dashboard() {
         title: "",
         description:"",
     });
+    const [isAccepted, setIsAccepted]= useState(false)
 
     function handleChange(event) {
         const {name,value}= event.target
@@ -16,13 +18,21 @@ function Dashboard() {
         })
     }
 
-    function handleClick(event) {
+    async function handleClick(event) {
         event.preventDefault();
 
-        setItems(prevItems => {
-            return([...prevItems, inputText])
-        })
-        setText({ title: "", description: "" })
+        const data= await axios.post("http://localhost:3000/dashboard", inputText);
+        if (data) {
+            setItems(prevItems => {
+                return([...prevItems, inputText])
+            })
+            setText({ title: "", description: "" })
+            
+        } else {
+            setIsAccepted(true);
+        }
+
+       
     }
 
     return(<div className="dash-container">
@@ -32,8 +42,8 @@ function Dashboard() {
         </nav>
         <form action="">
             <div className="input-group">
-                <input onChange={handleChange} type="text" name="title" id="title" value={inputText.title}/>
-                <textarea onChange={handleChange} name="description" id="description" value={inputText.description}></textarea>
+                <input onChange={handleChange} type="text" name="title" id="title" value={inputText.title} style={{ border: isAccepted? "2px solid red" : "" }}/>
+                <textarea onChange={handleChange} name="description" id="description" value={inputText.description} style={{ border: isAccepted? "2px solid red" : "" }}></textarea>
             </div>
             <button type="submit" onClick={handleClick}>Add</button>
         </form>
@@ -44,7 +54,7 @@ function Dashboard() {
             <button>Completed</button>
         </div>
 
-        {items.map(item => <Items title={item.title} description={item.description} />)}
+        {items.map((item,index) => <Items key={index} title={item.title} description={item.description} />)}
     </div>)
 }
 

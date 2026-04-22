@@ -42,7 +42,7 @@ app.get("/dashboard", (req,res) => {
     if(req.isAuthenticated()) {
         res.json({ success: true })
     } else {
-        res.redirect("/login")
+        res.redirect("/")
     }
 })
 
@@ -69,20 +69,27 @@ app.post("/login", passport.authenticate("local"), (req,res) => {
     res.json({ success: true })
 })
 
-app.post("/dashboard", (req,res) => {
+app.post("/dashboard", async (req,res) => {
     const title= req.body.title;
     const description= req.body.description;
+    
     try {
-        const task= db.query("INSERT INTO tasks(title,description) VALUES($1,$2)",[title,description]);
+        if(req.isAuthenticated()) {
+            const user= parseInt(req.user.id);
+            const task= await db.query("INSERT INTO tasks(title,description,user_id) VALUES($1,$2,$3)",[title,description,user]);
+            res.json({ success: true })
+        } else {
+            res.redirect("/")
+        }
     } catch(err) {
-
+        res.status(501).json({error: "Cant add to database"})
+        console.log(err)
     }
 })
 
 passport.use(new Strategy(async function verify(username, password, cb) {
     try{
         const result = await db.query("SELECT * FROM users WHERE email=$1",[username]);
-        console.log(username)
 
         if (result.rows.length > 0) {
             const user = result.rows[0];
