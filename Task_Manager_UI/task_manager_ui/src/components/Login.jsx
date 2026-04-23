@@ -15,9 +15,10 @@ function Login() {
         event.preventDefault();
 
         try {
-          const result=  await axios.post("http://localhost:3000/login", inputText)
-            if (result) {
+          const result=  await axios.post("http://localhost:3000/login", inputText, { withCredentials: true })
+            if (result.data.success) {
                 navigate("/dashboard");
+                console.log(result.data.success)
             } else {
                 return ("Wrong email or password")
             }

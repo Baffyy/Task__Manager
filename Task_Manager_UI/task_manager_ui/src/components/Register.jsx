@@ -15,11 +15,11 @@ function Register() {
         event.preventDefault();
 
         try {
-            await axios.post("http://localhost:3000/register", inputText)
+            await axios.post("http://localhost:3000/register", inputText, { withCredentials: true })
+            navigate("/")
         } catch(error) {
             console.error(error);
         }
-        navigate("/dashboard")
     }
 
     function handleChange(event) {
@@ -37,7 +37,7 @@ function Register() {
                 <h2>Register</h2>
                 <div className="box">
                     <label htmlFor="email">Email</label>
-                    <input type="text" onChange={handleChange} name="username" id="email" value={inputText.email}/>
+                    <input type="text" onChange={handleChange} name="username" id="email" value={inputText.username}/>
                 </div>
                 <div className="box">
                     <label htmlFor="password">Password</label>

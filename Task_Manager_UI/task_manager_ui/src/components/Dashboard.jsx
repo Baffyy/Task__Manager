@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import Items from "./Items";
 
@@ -8,7 +9,9 @@ function Dashboard() {
         title: "",
         description:"",
     });
-    const [isAccepted, setIsAccepted]= useState(false)
+    const [isAccepted, setIsAccepted]= useState(true);
+
+    const navigate=useNavigate();
 
     function handleChange(event) {
         const {name,value}= event.target
@@ -18,10 +21,20 @@ function Dashboard() {
         })
     }
 
+    useEffect(() => {
+        axios.get("http://localhost:3000/dashboard", { withCredentials: true })
+            .then(res => {
+                if (!res.data.success) {
+                    navigate("/")
+                }
+            })
+            .catch(() => navigate("/"))
+    }, [])
+
     async function handleClick(event) {
         event.preventDefault();
 
-        const data= await axios.post("http://localhost:3000/dashboard", inputText);
+        const data= await axios.post("http://localhost:3000/dashboard", inputText, { withCredentials: true });
         if (data) {
             setItems(prevItems => {
                 return([...prevItems, inputText])
@@ -29,7 +42,7 @@ function Dashboard() {
             setText({ title: "", description: "" })
             
         } else {
-            setIsAccepted(true);
+            setIsAccepted(false);
         }
 
        
@@ -42,8 +55,8 @@ function Dashboard() {
         </nav>
         <form action="">
             <div className="input-group">
-                <input onChange={handleChange} type="text" name="title" id="title" value={inputText.title} style={{ border: isAccepted? "2px solid red" : "" }}/>
-                <textarea onChange={handleChange} name="description" id="description" value={inputText.description} style={{ border: isAccepted? "2px solid red" : "" }}></textarea>
+                <input onChange={handleChange} type="text" name="title" id="title" value={inputText.title} style={{ border: isAccepted? "" : "2px solid red" }}/>
+                <textarea onChange={handleChange} name="description" id="description" value={inputText.description} style={{ border: isAccepted? "" : "2px solid red" }}></textarea>
             </div>
             <button type="submit" onClick={handleClick}>Add</button>
         </form>

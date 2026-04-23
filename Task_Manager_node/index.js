@@ -1,6 +1,5 @@
 import express from "express";
 import pg from "pg";
-import axios from "axios";
 import bcrypt from "bcrypt";
 import env from "dotenv";
 import session from "express-session";
@@ -24,7 +23,7 @@ const db = new pg.Client({
 })
 db.connect();
 
-app.use(cors());
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 app.use(session ({
     secret: process.env.SECRET,
@@ -38,6 +37,7 @@ app.use(session ({
 app.use(passport.initialize());
 app.use(passport.session())
 
+
 app.get("/dashboard", (req,res) => {
     if(req.isAuthenticated()) {
         res.json({ success: true })
@@ -47,11 +47,11 @@ app.get("/dashboard", (req,res) => {
 })
 
 app.post("/register", async(req,res) => {
-    const email= req.body.email;
+    const email= req.body.username;
     const password= req.body.password;
 
     try {
-        const registeredUser = await db.query("SELECT * FROM users WHERE email= $1",[email]);
+        const registeredUser = await db.query("SELECT * FROM users WHERE email= $1",[username]);
         if (registeredUser.rows.length > 0) {
             res.send("Email already exists. Try logging in")
         } else {
@@ -65,26 +65,9 @@ app.post("/register", async(req,res) => {
     }
 })
 
+
 app.post("/login", passport.authenticate("local"), (req,res) => {
     res.json({ success: true })
-})
-
-app.post("/dashboard", async (req,res) => {
-    const title= req.body.title;
-    const description= req.body.description;
-    
-    try {
-        if(req.isAuthenticated()) {
-            const user= parseInt(req.user.id);
-            const task= await db.query("INSERT INTO tasks(title,description,user_id) VALUES($1,$2,$3)",[title,description,user]);
-            res.json({ success: true })
-        } else {
-            res.redirect("/")
-        }
-    } catch(err) {
-        res.status(501).json({error: "Cant add to database"})
-        console.log(err)
-    }
 })
 
 passport.use(new Strategy(async function verify(username, password, cb) {
@@ -106,13 +89,31 @@ passport.use(new Strategy(async function verify(username, password, cb) {
                 }
             } )
         } else {
-            return cb("User not found")
+            return cb(null,false)
         }
         
     } catch(err) {
         console.log(err);
     }
 }))
+
+app.post("/dashboard", async (req,res) => {
+    const title= req.body.title;
+    const description= req.body.description;
+    
+    try {
+        if(req.isAuthenticated()) {
+            const user= parseInt(req.user.id);
+            const task= await db.query("INSERT INTO tasks(title,description,user_id) VALUES($1,$2,$3)",[title,description,user]);
+            res.json({ success: true })
+        } else {
+            res.redirect("/")
+        }
+    } catch(err) {
+        res.status(501).json({error: "Cant add to database"})
+        console.log(err)
+    }
+})
 
 passport.serializeUser((user,cb) => {
     cb(null,user)
