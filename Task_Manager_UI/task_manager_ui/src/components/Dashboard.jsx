@@ -26,6 +26,8 @@ function Dashboard() {
             .then(res => {
                 if (!res.data.success) {
                     navigate("/")
+                } else {
+                    setItems(res.data.tasks);
                 }
             })
             .catch(() => navigate("/"))
@@ -44,14 +46,21 @@ function Dashboard() {
         } else {
             setIsAccepted(false);
         }
+    }
 
-       
+   async function handleLogout() {
+      const logout=  await axios.post("http://localhost:3000/logout",{ withCredentials: true } );
+      if (logout) {
+        navigate("/");
+      } else {
+        setIsAccepted(false);
+      }
     }
 
     return(<div className="dash-container">
         <nav>
             <h1>Task Manager</h1>
-            <button className="btn">Logout</button>
+            <button onClick={handleLogout} className="btn">Logout</button>
         </nav>
         <form action="">
             <div className="input-group">

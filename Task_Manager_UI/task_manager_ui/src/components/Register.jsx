@@ -16,7 +16,7 @@ function Register() {
 
         try {
             await axios.post("http://localhost:3000/register", inputText, { withCredentials: true })
-            navigate("/")
+            navigate("/dashboard")
         } catch(error) {
             console.error(error);
         }

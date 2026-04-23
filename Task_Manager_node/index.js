@@ -38,11 +38,14 @@ app.use(passport.initialize());
 app.use(passport.session())
 
 
-app.get("/dashboard", (req,res) => {
+
+app.get("/dashboard", async (req,res) => {
     if(req.isAuthenticated()) {
-        res.json({ success: true })
+        const user = parseInt(req.user.id);
+        const tasks = await db.query("SELECT * FROM tasks WHERE user_id=$1", [user]);
+        res.json({ success: true, tasks: tasks.rows })
     } else {
-        res.redirect("/")
+        res.status(401).json({ success: false })
     }
 })
 
@@ -51,7 +54,7 @@ app.post("/register", async(req,res) => {
     const password= req.body.password;
 
     try {
-        const registeredUser = await db.query("SELECT * FROM users WHERE email= $1",[username]);
+        const registeredUser = await db.query("SELECT * FROM users WHERE email= $1",[email]);
         if (registeredUser.rows.length > 0) {
             res.send("Email already exists. Try logging in")
         } else {
@@ -62,6 +65,7 @@ app.post("/register", async(req,res) => {
         }
     } catch(err) {
         res.status(500).json({ error: "Internal server error" })
+        console.log(err);
     }
 })
 
@@ -107,13 +111,21 @@ app.post("/dashboard", async (req,res) => {
             const task= await db.query("INSERT INTO tasks(title,description,user_id) VALUES($1,$2,$3)",[title,description,user]);
             res.json({ success: true })
         } else {
-            res.redirect("/")
+            res.json({ success: false });
+
         }
     } catch(err) {
         res.status(501).json({error: "Cant add to database"})
         console.log(err)
     }
 })
+
+app.post('/logout', (req, res, next) => {
+    req.logout((err) => {
+      if (err) { return next(err); }
+      res.json({ success: true });
+    });
+  });
 
 passport.serializeUser((user,cb) => {
     cb(null,user)
