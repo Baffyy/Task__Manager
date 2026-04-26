@@ -9,7 +9,7 @@ function Dashboard() {
         title: "",
         description:"",
     });
-    const [isAccepted, setIsAccepted]= useState(true);
+    
 
     const navigate=useNavigate();
 
@@ -43,18 +43,14 @@ function Dashboard() {
             })
             setText({ title: "", description: "" })
             
-        } else {
-            setIsAccepted(false);
-        }
+        } 
     }
 
    async function handleLogout() {
-      const logout=  await axios.post("http://localhost:3000/logout",{ withCredentials: true } );
+      const logout=  await axios.post("http://localhost:3000/logout",{}, { withCredentials: true } );
       if (logout) {
         navigate("/");
-      } else {
-        setIsAccepted(false);
-      }
+      } 
     }
 
     return(<div className="dash-container">
@@ -64,8 +60,8 @@ function Dashboard() {
         </nav>
         <form action="">
             <div className="input-group">
-                <input onChange={handleChange} type="text" name="title" id="title" value={inputText.title} style={{ border: isAccepted? "" : "2px solid red" }}/>
-                <textarea onChange={handleChange} name="description" id="description" value={inputText.description} style={{ border: isAccepted? "" : "2px solid red" }}></textarea>
+                <input onChange={handleChange} type="text" name="title" id="title" value={inputText.title} placeholder="Title..."/>
+                <textarea onChange={handleChange} name="description" id="description" value={inputText.description} placeholder="Enter your task😌"></textarea>
             </div>
             <button type="submit" onClick={handleClick}>Add</button>
         </form>
