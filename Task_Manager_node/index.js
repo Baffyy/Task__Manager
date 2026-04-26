@@ -56,7 +56,7 @@ app.post("/register", async(req,res) => {
     try {
         const registeredUser = await db.query("SELECT * FROM users WHERE email= $1",[email]);
         if (registeredUser.rows.length > 0) {
-            res.send("Email already exists. Try logging in")
+            res.status(409).json({ error: "Email already exists" })
         } else {
             bcrypt.hash(password, saltRounds, async(err,hash) => {
               const result = await db.query("INSERT INTO users(email,password) VALUES($1,$2)", [email,hash])

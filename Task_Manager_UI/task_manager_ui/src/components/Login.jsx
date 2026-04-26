@@ -54,12 +54,13 @@ function Login() {
                 <h2>Sign In</h2>
                 <div className="login-box">
                 <label htmlFor="username">Email</label>
-                <input type="text" onChange={handleChange} name="username" id="username" value={inputText.username}  style={{ border: isAccepted? "" : "2px solid red" }}/>
+                <input type="text" onChange={handleChange} name="username" id="username" value={inputText.username}  style={{ border: isAccepted? "" : "1px solid red" }}/>
                 </div>
                 <div className="login-box">
                 <label htmlFor="password">Password</label>
-                <input type="password" onChange={handleChange} name="password" id="password" value={inputText.password}  style={{ border: isAccepted? "" : "2px solid red" }}/>
+                <input type="password" onChange={handleChange} name="password" id="password" value={inputText.password}  style={{ border: isAccepted? "" : "1px solid red" }}/>
                 </div>
+                <p className="loginError" style={{display: isAccepted? "none" : "inline-block"}}>Wrong Email or Password</p>
                 <button className="btn" onClick={handleClick} type="submit">Login</button>
             </div>
 

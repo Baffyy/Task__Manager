@@ -106,6 +106,19 @@
     text-align: center;
     margin-top: 1rem;
   }
+
+  .registerError {
+    color: red;
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .loginError {
+    color: red;
+    margin: 10px auto;
+    text-align: center;
+  }
+
   
   /* DASHBOARD */
   .dash-container {

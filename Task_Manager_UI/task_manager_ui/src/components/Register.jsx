@@ -18,9 +18,9 @@ function Register() {
 
         try {
             await axios.post("http://localhost:3000/register", inputText, { withCredentials: true })
-            navigate("/dashboard")
+            navigate("/")
         } catch(error) {
-            setIsNotRegistered(false);
+           return setIsNotRegistered(false);
             console.error(error);
         }
     }
@@ -48,7 +48,7 @@ function Register() {
                 </div>
                 <button className="btn" onClick={handleClick} type="submit">Register</button>
             </div>
-            <p style={{display: isRegistered? "none"  : "inline-block" }}>Email already exists. Try logging in</p>
+            <p className="registerError" style={{display: isRegistered? "none"  : "inline-block" }}>Email already exists. Try logging in</p>
         </div>
     </form>)
 }

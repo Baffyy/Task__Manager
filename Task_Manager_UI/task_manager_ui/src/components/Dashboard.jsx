@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import Items from "./Items";
+import Button from "./Buttons";
 
 function Dashboard() {
     const [items, setItems] = useState([]);
@@ -66,13 +67,13 @@ function Dashboard() {
             <button type="submit" onClick={handleClick}>Add</button>
         </form>
         <hr />
-        <div className="button-group">
-            <button>All</button>
-            <button>Active</button>
-            <button>Completed</button>
-        </div>
+       <Button />
+
+       {items.filter(item => filter === "all" ? true : item.status === filter)};
 
         {items.map((item,index) => <Items key={index} title={item.title} description={item.description} />)}
+
+
     </div>)
 }
 
