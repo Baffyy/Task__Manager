@@ -1,16 +1,13 @@
 import react, {useState} from "react";
 import { useNavigate } from "react-router-dom";
 
-function Button() {
-    const [filter, setFilter] = useState("all");
-
+function Button(props) {
     return(
 
-// In your JSX:
 <div className="button-group">
-    <button onClick={() => setFilter("all")}>All</button>
-    <button onClick={() => setFilter("active")}>Active</button>
-    <button onClick={() => setFilter("completed")}>Completed</button>
+    <button onClick={() => props.setFilter("all")}>All</button>
+    <button onClick={() => props.setFilter("active")}>Active</button>
+    <button onClick={() => props.setFilter("completed")}>Completed</button>
 </div>)
 }
 

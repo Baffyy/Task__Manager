@@ -127,6 +127,17 @@ app.post('/logout', (req, res, next) => {
     });
   });
 
+  app.post("/done", async(req,res) => {
+    const done= "Completed";
+    const id= parseInt(req.body.id);
+    try {
+        const task= await db.query("UPDATE tasks SET status =$1 WHERE id=$2",[done, id]);
+        res.json({success:true})
+    } catch(err) {
+        console.error(err);
+    }
+  })
+
 passport.serializeUser((user,cb) => {
     cb(null,user)
 });

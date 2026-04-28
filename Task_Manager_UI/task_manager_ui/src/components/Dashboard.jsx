@@ -10,6 +10,8 @@ function Dashboard() {
         title: "",
         description:"",
     });
+
+    const [filter, setFilter] = useState("all")
     
 
     const navigate=useNavigate();
@@ -54,6 +56,17 @@ function Dashboard() {
       } 
     }
 
+    function removeItem(id) {
+        setItems(prevItems => {return prevItems.filter((item) => {
+            return item.id !== id;
+        })})
+    }
+
+    function showAll() {
+        setItems(prevItems => {return prevItems})
+    }
+
+
     return(<div className="dash-container">
         <nav>
             <h1>Task Manager</h1>
@@ -67,12 +80,12 @@ function Dashboard() {
             <button type="submit" onClick={handleClick}>Add</button>
         </form>
         <hr />
-       <Button />
+       <Button setFilter={setFilter}/>
 
-       {items.filter(item => filter === "all" ? true : item.status === filter)};
-
-        {items.map((item,index) => <Items key={index} title={item.title} description={item.description} />)}
-
+       {items
+            .filter(item => filter === "all" ? true : item.status === filter)
+            .map((item, index) => <Items key={index} id={item.id} done={removeItem} title={item.title} description={item.description}/>)
+    }
 
     </div>)
 }

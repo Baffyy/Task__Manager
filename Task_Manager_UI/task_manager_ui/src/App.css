@@ -231,15 +231,7 @@
   .button-group button:hover { background: rgba(255, 255, 255, 0.5); }
   .button-group button.active { background: white; }
   
-  /* TASKS */
-  .dash-container > div:last-child > div {
-    background: white;
-    padding: 14px 18px;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
-  }
-  
+  /* TASKS */  
   .dash-container h3 {
     font-size: 15px;
     font-weight: 600;
@@ -249,4 +241,29 @@
   .dash-container p {
     font-size: 13px;
     color: #6e6e73;
+    margin-bottom: 10px;
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin: 8px auto;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  }
+
+  .item-btn button {
+    margin-right: 4px;
+    padding: 5px 6px;
+    border-radius: 20px;
+    border: 1px solid black;
+    cursor: pointer;
+  }
+
+  .item-btn button:hover {
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid black;
   }
