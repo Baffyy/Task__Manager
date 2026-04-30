@@ -42,7 +42,7 @@ function Dashboard() {
         const data= await axios.post("http://localhost:3000/dashboard", inputText, { withCredentials: true });
         if (data) {
             setItems(prevItems => {
-                return([...prevItems, inputText])
+                return([...prevItems, {...inputText, status: "pending"}])
             })
             setText({ title: "", description: "" })
             
@@ -56,15 +56,16 @@ function Dashboard() {
       } 
     }
 
-    function removeItem(id) {
-        setItems(prevItems => {return prevItems.filter((item) => {
-            return item.id !== id;
-        })})
+    function markComplete(id) {
+        setItems(prevItems => prevItems.map(item => 
+            item.id === id ? {...item, status: "completed"} : item
+        ))
     }
 
-    function showAll() {
-        setItems(prevItems => {return prevItems})
+    function deleteItem(id) {
+        setItems(prevItems => prevItems.filter(item => item.id !== id ))
     }
+
 
 
     return(<div className="dash-container">
@@ -83,8 +84,12 @@ function Dashboard() {
        <Button setFilter={setFilter}/>
 
        {items
-            .filter(item => filter === "all" ? true : item.status === filter)
-            .map((item, index) => <Items key={index} id={item.id} done={removeItem} title={item.title} description={item.description}/>)
+            .filter(item => {
+                if (filter === "all") return true;
+                if (filter === "active") return item.status === "pending";
+                return item.status === "completed";
+            })
+            .map((item, index) => <Items key={index} id={item.id} done={markComplete}  delete={deleteItem} title={item.title} description={item.description}/>)
     }
 
     </div>)

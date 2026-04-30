@@ -20,7 +20,7 @@ function Register() {
             await axios.post("http://localhost:3000/register", inputText, { withCredentials: true })
             navigate("/")
         } catch(error) {
-           return setIsNotRegistered(false);
+           setIsNotRegistered(false);
             console.error(error);
         }
     }

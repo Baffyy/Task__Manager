@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import Login from './Login';
 import Register from './Register';
 import Dashboard from './Dashboard';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import axios from "axios";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import '../App.css'
 
 function App() {

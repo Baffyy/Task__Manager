@@ -97,6 +97,7 @@ passport.use(new Strategy(async function verify(username, password, cb) {
         }
         
     } catch(err) {
+        cb(err);
         console.log(err);
     }
 }))
@@ -128,13 +129,23 @@ app.post('/logout', (req, res, next) => {
   });
 
   app.post("/done", async(req,res) => {
-    const done= "Completed";
+    const done= "completed";
     const id= parseInt(req.body.id);
     try {
         const task= await db.query("UPDATE tasks SET status =$1 WHERE id=$2",[done, id]);
         res.json({success:true})
     } catch(err) {
         console.error(err);
+    }
+  })
+
+  app.post("/delete", async (req,res) => {
+    const id= parseInt(req.body.id);
+    try {
+        const task= await db.query("DELETE FROM tasks WHERE id=$1", [id])
+        res.json({success:true})
+    } catch(err) {
+        console.error(err)
     }
   })
 

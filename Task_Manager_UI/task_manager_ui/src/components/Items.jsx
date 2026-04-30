@@ -1,20 +1,25 @@
 import React from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 function Items(props) {
     const navigate=useNavigate();
 
    async function done() {
+        console.log("done clicked")
+        console.log(props.id)
          const data = await axios.post("http://localhost:3000/done",{id: props.id}, {withCredentials: true}) 
+         console.log("response:", data)
          if (data) {
-            {props.done(props.id)};
-            navigate("/dashboard")
+            props.done(props.id);
          }
     }
 
-    async function remove() {
+    async function del() {
 
+        const data= await axios.post("http://localhost:3000/delete", {id: props.id}, {withCredentials: true});
+        if(data) {
+            props.delete(props.id);
+        }
     }
 
     return(<div className="item">
@@ -27,7 +32,7 @@ function Items(props) {
 
         <div className="item-btn">
             <button onClick={done}>✅</button>
-            <button onClick={remove}>❌</button>
+            <button onClick={del}>❌</button>
         </div>
     </div>)
 }
