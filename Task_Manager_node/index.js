@@ -53,10 +53,11 @@ app.post("/register", async(req,res) => {
     const email= req.body.username;
     const password= req.body.password;
     console.log(email);
-    console.log(registeredUser.rows)
+    
 
     try {
         const registeredUser = await db.query("SELECT * FROM users WHERE email= $1",[email]);
+        console.log(registeredUser.rows)
         if (registeredUser.rows.length > 0) {
             res.status(409).json({ error: "Email already exists" })
         } else {
