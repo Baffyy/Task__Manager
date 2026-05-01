@@ -7,7 +7,7 @@ function Items(props) {
    async function done() {
         console.log("done clicked")
         console.log(props.id)
-         const data = await axios.post("https://task-manager-fibo.onrender.com",{id: props.id}, {withCredentials: true}) 
+         const data = await axios.post("https://task-manager-fibo.onrender.com/done",{id: props.id}, {withCredentials: true}) 
          console.log("response:", data)
          if (data) {
             props.done(props.id);
@@ -16,7 +16,7 @@ function Items(props) {
 
     async function del() {
 
-        const data= await axios.post("https://task-manager-fibo.onrender.com", {id: props.id}, {withCredentials: true});
+        const data= await axios.post("https://task-manager-fibo.onrender.com/delete", {id: props.id}, {withCredentials: true});
         if(data) {
             props.delete(props.id);
         }

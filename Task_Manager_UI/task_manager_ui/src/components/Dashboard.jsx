@@ -25,7 +25,7 @@ function Dashboard() {
     }
 
     useEffect(() => {
-        axios.get("https://task-manager-fibo.onrender.com", { withCredentials: true })
+        axios.get("https://task-manager-fibo.onrender.com/dashboard", { withCredentials: true })
             .then(res => {
                 if (!res.data.success) {
                     navigate("/")
@@ -39,7 +39,7 @@ function Dashboard() {
     async function handleClick(event) {
         event.preventDefault();
 
-        const data= await axios.post("https://task-manager-fibo.onrender.com", inputText, { withCredentials: true });
+        const data= await axios.post("https://task-manager-fibo.onrender.com/dashboard", inputText, { withCredentials: true });
         if (data) {
             setItems(prevItems => {
                 return([...prevItems, {...inputText, status: "pending"}])
@@ -50,7 +50,7 @@ function Dashboard() {
     }
 
    async function handleLogout() {
-      const logout=  await axios.post("https://task-manager-fibo.onrender.com",{}, { withCredentials: true } );
+      const logout=  await axios.post("https://task-manager-fibo.onrender.com/logout",{}, { withCredentials: true } );
       if (logout) {
         navigate("/");
       } 
