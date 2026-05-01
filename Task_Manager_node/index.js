@@ -23,14 +23,17 @@ const db = new pg.Client({
 })
 db.connect();
 
+app.set("trust proxy", 1);
 app.use(cors({ origin: "https://task-manager-1k9y.onrender.com", credentials: true }));
 app.use(express.json());
-app.use(session ({
+app.use(session({
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24
+        maxAge: 1000 * 60 * 60 * 24,
+        secure: true,
+        sameSite: "none"
     }
 }))
 
