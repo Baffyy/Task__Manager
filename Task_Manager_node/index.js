@@ -23,7 +23,7 @@ const db = new pg.Client({
 })
 db.connect();
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(session ({
     secret: process.env.SECRET,
@@ -52,6 +52,8 @@ app.get("/dashboard", async (req,res) => {
 app.post("/register", async(req,res) => {
     const email= req.body.username;
     const password= req.body.password;
+    console.log(email);
+    console.log(registeredUser.rows)
 
     try {
         const registeredUser = await db.query("SELECT * FROM users WHERE email= $1",[email]);
