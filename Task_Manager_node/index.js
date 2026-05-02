@@ -6,6 +6,7 @@ import session from "express-session";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import cors from "cors";
+import pgSession from "connect-pg-simple";
 
 
 
@@ -13,6 +14,7 @@ env.config();
 const app= express();
 const port= process.env.PORT;
 const saltRounds=parseInt(process.env.SALTROUNDS);
+const PgSession = pgSession(session);
 
 const db = new pg.Client({
     user: process.env.DB_USER,
@@ -27,9 +29,19 @@ app.set("trust proxy", 1);
 app.use(cors({ origin: "https://task-manager-1k9y.onrender.com", credentials: true }));
 app.use(express.json());
 app.use(session({
+    store: new PgSession({
+        conObject: {
+            user: process.env.DB_USER,
+            host: process.env.DB_HOST,
+            database: process.env.DB_DATABASE,
+            password: process.env.DB_PASSWORD,
+            port: process.env.DB_PORT,
+        },
+        createTableIfMissing: true
+    }),
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24,
         secure: true,

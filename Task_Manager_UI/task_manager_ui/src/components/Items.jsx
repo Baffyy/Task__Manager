@@ -2,8 +2,6 @@ import React from "react";
 import axios from "axios";
 
 function Items(props) {
-    const navigate=useNavigate();
-
    async function done() {
         console.log("done clicked")
         console.log(props.id)
