@@ -16,7 +16,7 @@ function Login() {
         event.preventDefault();
 
         try {
-          const result=  await axios.post("https://task-manager-fibo.onrender.com/login", inputText, { withCredentials: true })
+          const result=  await axios.post("/login", inputText, { withCredentials: true })
             if (result.data.success) {
                 navigate("/dashboard");
                 console.log(result.data.success)

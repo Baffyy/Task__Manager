@@ -7,6 +7,8 @@ import passport from "passport";
 import { Strategy } from "passport-local";
 import cors from "cors";
 import pgSession from "connect-pg-simple";
+import path from "path";
+import { fileURLToPath } from "url";
 
 
 
@@ -15,6 +17,8 @@ const app= express();
 const port= process.env.PORT;
 const saltRounds=parseInt(process.env.SALTROUNDS);
 const PgSession = pgSession(session);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const db = new pg.Client({
     user: process.env.DB_USER,
@@ -26,7 +30,6 @@ const db = new pg.Client({
 db.connect();
 
 app.set("trust proxy", 1);
-app.use(cors({ origin: "https://task-manager-1k9y.onrender.com", credentials: true }));
 app.use(express.json());
 app.use(session({
     store: new PgSession({
@@ -44,13 +47,14 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24,
-        secure: true,
-        sameSite: "none"
+        secure: true
     }
 }))
 
 app.use(passport.initialize());
 app.use(passport.session())
+app.use(express.static(path.join(__dirname, "../Task_Manager_UI/dist")));
+
 
 
 
@@ -166,6 +170,10 @@ app.post('/logout', (req, res, next) => {
         console.error(err)
     }
   })
+
+  app.get("/*splat", (req, res) => {
+    res.sendFile(path.join(__dirname, "../Task_Manager_UI/dist/index.html"));
+});
 
 passport.serializeUser((user,cb) => {
     cb(null,user)
