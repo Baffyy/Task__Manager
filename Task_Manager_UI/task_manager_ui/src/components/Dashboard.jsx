@@ -42,7 +42,7 @@ function Dashboard() {
         const data= await axios.post("https://task-manager-fibo.onrender.com/dashboard", inputText, { withCredentials: true });
         if (data) {
             setItems(prevItems => {
-                return([...prevItems, {...inputText, status: "pending"}])
+                return([...prevItems, {...inputText, status: "pending", id}])
             })
             setText({ title: "", description: "" })
             

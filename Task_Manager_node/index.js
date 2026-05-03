@@ -127,8 +127,8 @@ app.post("/dashboard", async (req,res) => {
     try {
         if(req.isAuthenticated()) {
             const user= parseInt(req.user.id);
-            const task= await db.query("INSERT INTO tasks(title,description,user_id) VALUES($1,$2,$3)",[title,description,user]);
-            res.json({ success: true })
+            const task = await db.query("INSERT INTO tasks(title,description,user_id) VALUES($1,$2,$3) RETURNING id", [title,description,user]);
+            res.json({ success: true, id: task.rows[0].id })            
         } else {
             res.json({ success: false });
 
@@ -151,7 +151,7 @@ app.post('/logout', (req, res, next) => {
     const id= parseInt(req.body.id);
     try {
         const task= await db.query("UPDATE tasks SET status =$1 WHERE id=$2",[done, id]);
-        res.json({success:true})
+        res.json({success:true, id: id})
     } catch(err) {
         console.error(err);
     }
