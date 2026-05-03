@@ -12,6 +12,8 @@ function Dashboard() {
     });
 
     const [filter, setFilter] = useState("all")
+
+    const [isAccepted, setIsAccepted]= useState(true);
     
 
     const navigate=useNavigate();
@@ -39,12 +41,15 @@ function Dashboard() {
     async function handleClick(event) {
         event.preventDefault();
 
-        const data= await axios.post("/dashboard", inputText, { withCredentials: true });
-        if (data) {
-            setItems(prevItems => {
-                return [...prevItems, {...inputText, status: "pending", id: data.data.id}]
-            })
-            setText({ title: "", description: "" })
+        
+        if (inputText.title === "" ||inputText.description === "") {
+                setIsAccepted(false)
+        } else {
+                const data= await axios.post("/dashboard", inputText, { withCredentials: true });
+                setItems(prevItems => {
+                    return [...prevItems, {...inputText, status: "pending", id: data.data.id}]
+                })
+                setText({ title: "", description: "" })
         }
     }
 
@@ -74,8 +79,8 @@ function Dashboard() {
         </nav>
         <form action="">
             <div className="input-group">
-                <input onChange={handleChange} type="text" name="title" id="title" value={inputText.title} placeholder="Title..."/>
-                <textarea onChange={handleChange} name="description" id="description" value={inputText.description} placeholder="Enter your task😌"></textarea>
+                <input onChange={handleChange} type="text" name="title" id="title" value={inputText.title} placeholder="Title..." style={{ border: isAccepted? "" : "1px solid red" }}/>
+                <textarea onChange={handleChange} name="description" id="description" value={inputText.description} placeholder="Enter your task😌" style={{ border: isAccepted? "" : "1px solid red" }}></textarea>
             </div>
             <button type="submit" onClick={handleClick}>Add</button>
         </form>
