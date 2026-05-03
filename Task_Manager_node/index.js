@@ -53,7 +53,7 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session())
-app.use(express.static(path.join(__dirname, "../Task_Manager_UI/dist")));
+app.use(express.static(path.join(__dirname, "../Task_Manager_UI/task_manager_ui/dist")));
 
 
 
