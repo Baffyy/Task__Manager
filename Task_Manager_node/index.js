@@ -20,14 +20,21 @@ const PgSession = pgSession(session);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const db = new pg.Client({
+app.use(cors({ 
+    origin: ["http://localhost:5173", "https://task-manager-fibo.onrender.com"], 
+    credentials: true 
+}));
+
+const { Pool } = pg;
+
+const db = new Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
     database: process.env.DB_DATABASE,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
+    ssl: { rejectUnauthorized: false }
 })
-db.connect();
 
 app.set("trust proxy", 1);
 app.use(express.json());
@@ -39,6 +46,7 @@ app.use(session({
             database: process.env.DB_DATABASE,
             password: process.env.DB_PASSWORD,
             port: process.env.DB_PORT,
+            ssl: { rejectUnauthorized: false }
         },
         createTableIfMissing: true
     }),
@@ -71,12 +79,9 @@ app.get("/dashboard", async (req,res) => {
 app.post("/register", async(req,res) => {
     const email= req.body.username;
     const password= req.body.password;
-    console.log(email);
-    
 
     try {
         const registeredUser = await db.query("SELECT * FROM users WHERE email= $1",[email]);
-        console.log(registeredUser.rows)
         if (registeredUser.rows.length > 0) {
             res.status(409).json({ error: "Email already exists" })
         } else {
@@ -123,6 +128,42 @@ passport.use(new Strategy(async function verify(username, password, cb) {
         console.log(err);
     }
 }))
+
+app.post("/forgot", async (req, res) => {
+    const email = req.body.email;
+    try {
+        const info = await db.query("SELECT * FROM users WHERE email=$1", [email])
+        if (info.rows.length > 0) {
+            req.session.resetEmail = email;
+            res.json({ success: true, email: email })
+            
+
+        } else {
+            res.status(404).json({ error: "Email not found" })
+        }
+    } catch(err) {
+        console.error(err)
+    }
+})
+
+app.post("/reset", async (req,res) => {
+    const newPwd = req.body.newpwd;
+    const rePwd = req.body.repwd;
+
+    try {
+        if(req.session.resetEmail) {
+            bcrypt.hash(newPwd, saltRounds, async (err,hash) => {
+                const result = await db.query("UPDATE users  SET password =$1 WHERE email=$2", [hash,req.session.resetEmail])
+                res.json({success:true})
+                req.session.resetEmail= "";
+            })
+        } else {
+            res.status(409).json({error: "Can't update password"})
+        }
+    } catch(err) {
+        console.error(err)
+    }
+})
 
 app.post("/dashboard", async (req,res) => {
     const title= req.body.title;

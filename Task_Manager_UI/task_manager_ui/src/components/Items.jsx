@@ -3,10 +3,7 @@ import axios from "axios";
 
 function Items(props) {
    async function done() {
-        console.log("done clicked")
-        console.log(props.id)
          const data = await axios.post("/done",{id: props.id}, {withCredentials: true}) 
-         console.log("response:", data)
          if (data) {
             props.done(props.id);
          }

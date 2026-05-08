@@ -11,8 +11,13 @@
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
+
+  a { 
+    text-decoration: none;
+  }
+
   
-  /* LOGIN & REGISTER FORMS */
+  /* LOGIN & REGISTER FORMS & FORGOT*/
   .form {
     min-height: 100vh;
     display: flex;
@@ -30,7 +35,7 @@
     text-align: center;
   }
   
-  .container, .register-container {
+  .container, .register-container, .forgot-group {
     background: white;
     padding: 2.5rem;
     border-radius: 18px;
@@ -39,12 +44,14 @@
     max-width: 420px;
   }
   
-  .login h2, .register h2, .main-register h2 {
+  .login h2, .register h2, .main-register h2, .forgot_group h2, .reset-group h2, p {
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 1.25rem;
     text-align: center;
   }
+
+  
   
   .login-box, .box {
     margin-bottom: 1rem;
@@ -85,7 +92,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
-    margin-top: 0.5rem;
+    margin-top: 0.8rem;
   }
   
   .btn:hover { background: #0066d6; }
