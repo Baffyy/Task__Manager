@@ -45,7 +45,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(express.static(path.join(__dirname, "Task_Manager_UI/task_manager_ui/dist")));
+app.use(express.static(path.join(__dirname, "../Task_Manager_UI/task_manager_ui/dist")));
 
 app.get("/dashboard", async (req, res) => {
     if (req.isAuthenticated()) {
@@ -181,7 +181,7 @@ passport.serializeUser((user, cb) => { cb(null, user) });
 passport.deserializeUser((user, cb) => { cb(null, user) });
 
 app.get("/*splat", (req, res) => {
-    res.sendFile(path.join(__dirname, "Task_Manager_UI/task_manager_ui/dist/index.html"));
+    res.sendFile(path.join(__dirname, "../Task_Manager_UI/task_manager_ui/dist/index.html"));
 });
 
 app.listen(port, () => {
