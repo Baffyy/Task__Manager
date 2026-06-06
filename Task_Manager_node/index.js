@@ -20,12 +20,7 @@ const PgSession = pgSession(session);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cors({ 
-    origin: ["http://localhost:5173", "https://task-manager-fibo.onrender.com"], 
-    credentials: true 
-}));
-
-const { Pool } = pg;
+app.use(express.static(path.join(__dirname, "Task_Manager_UI/task_manager_ui/dist")));
 
 const db = new pg.Client({
     connectionString: process.env.DATABASE_URL,
@@ -202,7 +197,7 @@ app.post('/logout', (req, res, next) => {
   })
 
   app.get("/*splat", (req, res) => {
-    res.sendFile(path.join(__dirname, "../Task_Manager_UI/task_manager_ui/dist/index.html"));
+    res.sendFile(path.join(__dirname, "Task_Manager_UI/task_manager_ui/dist/index.html"));
 });
 
 passport.serializeUser((user,cb) => {
