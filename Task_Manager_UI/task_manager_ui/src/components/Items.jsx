@@ -10,11 +10,8 @@ function Items(props) {
     }
 
     async function del() {
-
-        const data= await axios.post("/delete", {id: props.id}, {withCredentials: true});
-        if(data) {
-            props.delete(props.id);
-        }
+        const data= await axios.delete(`/tasks/${props.id}`, {withCredentials: true});
+        props.delete(props.id);
     }
 
     return(<div className="item">

@@ -27,27 +27,16 @@ app.use(cors({
 
 const { Pool } = pg;
 
-const db = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_DATABASE,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
+const db = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
-})
+});
 
 app.set("trust proxy", 1);
 app.use(express.json());
 app.use(session({
     store: new PgSession({
-        conObject: {
-            user: process.env.DB_USER,
-            host: process.env.DB_HOST,
-            database: process.env.DB_DATABASE,
-            password: process.env.DB_PASSWORD,
-            port: process.env.DB_PORT,
-            ssl: { rejectUnauthorized: false }
-        },
+        conString: process.env.DATABASE_URL,
         createTableIfMissing: true
     }),
     secret: process.env.SECRET,
@@ -202,7 +191,7 @@ app.post('/logout', (req, res, next) => {
     }
   })
 
-  app.post("/delete", async (req,res) => {
+  app.delete("/tasks/:id", async (req,res) => {
     const id= parseInt(req.body.id);
     try {
         const task= await db.query("DELETE FROM tasks WHERE id=$1", [id])
