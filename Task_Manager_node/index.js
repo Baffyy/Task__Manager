@@ -10,7 +10,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 env.config();
-console.log("DATABASE_URL:", process.env.DATABASE_URL);
+
 
 const app = express();
 const port = process.env.PORT;
