@@ -199,9 +199,6 @@ app.post('/logout', (req, res, next) => {
     }
   })
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "Task_Manager_UI/task_manager_ui/dist/index.html"));
-});
 
 passport.serializeUser((user,cb) => {
     cb(null,user)
@@ -209,6 +206,10 @@ passport.serializeUser((user,cb) => {
 
 passport.deserializeUser((user,cb) => {
     cb(null,user)
+});
+
+app.get("/*splat", (req, res) => {
+    res.sendFile(path.join(__dirname, "Task_Manager_UI/task_manager_ui/dist/index.html"));
 });
 
 app.listen(port, () => {
