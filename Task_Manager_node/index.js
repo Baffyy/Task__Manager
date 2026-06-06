@@ -9,49 +9,45 @@ import pgSession from "connect-pg-simple";
 import path from "path";
 import { fileURLToPath } from "url";
 
-
-
 env.config();
-const app= express();
-const port= process.env.PORT;
-const saltRounds=parseInt(process.env.SALTROUNDS);
+
+const app = express();
+const port = process.env.PORT;
+const saltRounds = parseInt(process.env.SALTROUNDS);
 const PgSession = pgSession(session);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-app.use(express.static(path.join(__dirname, "Task_Manager_UI/task_manager_ui/dist")));
 
 const db = new pg.Client({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
-db.connect();
+db.connect(); 
 
 app.set("trust proxy", 1);
 app.use(express.json());
+
 app.use(session({
     store: new PgSession({
         conString: process.env.DATABASE_URL,
         createTableIfMissing: true
     }),
-    secret: process.env.SECRET,
+    secret: process.env.SECRET, 
     resave: false,
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24,
         secure: true
     }
-}))
+}));
 
 app.use(passport.initialize());
-app.use(passport.session())
-app.use(express.static(path.join(__dirname, "../Task_Manager_UI/task_manager_ui/dist")));
+app.use(passport.session());
 
+app.use(express.static(path.join(__dirname, "Task_Manager_UI/task_manager_ui/dist")));
 
-
-
-app.get("/dashboard", async (req,res) => {
-    if(req.isAuthenticated()) {
+app.get("/dashboard", async (req, res) => {
+    if (req.isAuthenticated()) {
         const user = parseInt(req.user.id);
         const tasks = await db.query("SELECT * FROM tasks WHERE user_id=$1", [user]);
         res.json({ success: true, tasks: tasks.rows })
@@ -60,58 +56,28 @@ app.get("/dashboard", async (req,res) => {
     }
 })
 
-app.post("/register", async(req,res) => {
-    const email= req.body.username;
-    const password= req.body.password;
-
+app.post("/register", async (req, res) => {
+    const email = req.body.username;
+    const password = req.body.password;
     try {
-        const registeredUser = await db.query("SELECT * FROM users WHERE email= $1",[email]);
+        const registeredUser = await db.query("SELECT * FROM users WHERE email=$1", [email]);
         if (registeredUser.rows.length > 0) {
             res.status(409).json({ error: "Email already exists" })
         } else {
-            bcrypt.hash(password, saltRounds, async(err,hash) => {
-              const result = await db.query("INSERT INTO users(email,password) VALUES($1,$2)", [email,hash])
-              res.json({success:true})
+            bcrypt.hash(password, saltRounds, async (err, hash) => {
+                await db.query("INSERT INTO users(email,password) VALUES($1,$2)", [email, hash]);
+                res.json({ success: true })
             })
         }
-    } catch(err) {
+    } catch (err) {
         res.status(500).json({ error: "Internal server error" })
         console.log(err);
     }
 })
 
-
-app.post("/login", passport.authenticate("local"), (req,res) => {
+app.post("/login", passport.authenticate("local"), (req, res) => {
     res.json({ success: true })
 })
-
-passport.use(new Strategy(async function verify(username, password, cb) {
-    try{
-        const result = await db.query("SELECT * FROM users WHERE email=$1",[username]);
-
-        if (result.rows.length > 0) {
-            const user = result.rows[0];
-            const storedPassword = user.password; 
-            bcrypt.compare(password, storedPassword, async (err, result) => {
-                if(err) {
-                    return cb(err)
-                } else {
-                    if(result) {
-                        return cb(null, user)
-                    } else {
-                        return cb(null,false)
-                    }
-                }
-            } )
-        } else {
-            return cb(null,false)
-        }
-        
-    } catch(err) {
-        cb(err);
-        console.log(err);
-    }
-}))
 
 app.post("/forgot", async (req, res) => {
     const email = req.body.email;
@@ -120,93 +86,98 @@ app.post("/forgot", async (req, res) => {
         if (info.rows.length > 0) {
             req.session.resetEmail = email;
             res.json({ success: true, email: email })
-            
-
         } else {
             res.status(404).json({ error: "Email not found" })
         }
-    } catch(err) {
+    } catch (err) {
         console.error(err)
     }
 })
 
-app.post("/reset", async (req,res) => {
+app.post("/reset", async (req, res) => {
     const newPwd = req.body.newpwd;
-    const rePwd = req.body.repwd;
-
     try {
-        if(req.session.resetEmail) {
-            bcrypt.hash(newPwd, saltRounds, async (err,hash) => {
-                const result = await db.query("UPDATE users  SET password =$1 WHERE email=$2", [hash,req.session.resetEmail])
-                res.json({success:true})
-                req.session.resetEmail= "";
+        if (req.session.resetEmail) {
+            bcrypt.hash(newPwd, saltRounds, async (err, hash) => {
+                await db.query("UPDATE users SET password=$1 WHERE email=$2", [hash, req.session.resetEmail]);
+                res.json({ success: true })
+                req.session.resetEmail = "";
             })
         } else {
-            res.status(409).json({error: "Can't update password"})
+            res.status(409).json({ error: "Can't update password" })
         }
-    } catch(err) {
+    } catch (err) {
         console.error(err)
     }
 })
 
-app.post("/dashboard", async (req,res) => {
-    const title= req.body.title;
-    const description= req.body.description;
-    
+app.post("/dashboard", async (req, res) => {
+    const title = req.body.title;
+    const description = req.body.description;
     try {
-        if(req.isAuthenticated()) {
-            const user= parseInt(req.user.id);
-            const task = await db.query("INSERT INTO tasks(title,description,user_id) VALUES($1,$2,$3) RETURNING id", [title,description,user]);
-            res.json({ success: true, id: task.rows[0].id })            
+        if (req.isAuthenticated()) {
+            const user = parseInt(req.user.id);
+            const task = await db.query("INSERT INTO tasks(title,description,user_id) VALUES($1,$2,$3) RETURNING id", [title, description, user]);
+            res.json({ success: true, id: task.rows[0].id })
         } else {
             res.json({ success: false });
-
         }
-    } catch(err) {
-        res.status(501).json({error: "Cant add to database"})
+    } catch (err) {
+        res.status(500).json({ error: "Can't add to database" })
         console.log(err)
     }
 })
 
-app.post('/logout', (req, res, next) => {
+app.post("/logout", (req, res, next) => {
     req.logout((err) => {
-      if (err) { return next(err); }
-      res.json({ success: true });
+        if (err) return next(err);
+        res.json({ success: true });
     });
-  });
+});
 
-  app.post("/done", async(req,res) => {
-    const done= "completed";
-    const id= parseInt(req.body.id);
+app.post("/done", async (req, res) => {
+    const done = "completed";
+    const id = parseInt(req.body.id);
     try {
-        const task= await db.query("UPDATE tasks SET status =$1 WHERE id=$2",[done, id]);
-        res.json({success:true, id: id})
-    } catch(err) {
+        await db.query("UPDATE tasks SET status=$1 WHERE id=$2", [done, id]);
+        res.json({ success: true, id: id })
+    } catch (err) {
         console.error(err);
     }
-  })
+})
 
-  app.delete("/tasks/:id", async (req,res) => {
+app.delete("/tasks/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ success: false });
     const id = parseInt(req.params.id);
     const userId = parseInt(req.user.id);
     try {
-        await db.query("DELETE FROM tasks WHERE id=$1 AND user_id=$2", [id, userId]);
+        await db.query("DELETE FROM tasks WHERE id=$1 AND user_id=$2", [id, userId]); 
         res.json({ success: true });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false });
     }
-  })
+})
 
+passport.use(new Strategy(async function verify(username, password, cb) {
+    try {
+        const result = await db.query("SELECT * FROM users WHERE email=$1", [username]);
+        if (result.rows.length > 0) {
+            const user = result.rows[0];
+            bcrypt.compare(password, user.password, (err, result) => {
+                if (err) return cb(err);
+                return result ? cb(null, user) : cb(null, false);
+            })
+        } else {
+            return cb(null, false)
+        }
+    } catch (err) {
+        cb(err);
+    }
+}))
 
-passport.serializeUser((user,cb) => {
-    cb(null,user)
-});
-
-passport.deserializeUser((user,cb) => {
-    cb(null,user)
-});
+passport.serializeUser((user, cb) => { cb(null, user) });
+passport.deserializeUser((user, cb) => { cb(null, user) });
 
 app.get("/*splat", (req, res) => {
     res.sendFile(path.join(__dirname, "Task_Manager_UI/task_manager_ui/dist/index.html"));
@@ -215,5 +186,3 @@ app.get("/*splat", (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
 });
-
-
