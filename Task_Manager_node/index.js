@@ -5,7 +5,6 @@ import env from "dotenv";
 import session from "express-session";
 import passport from "passport";
 import { Strategy } from "passport-local";
-import cors from "cors";
 import pgSession from "connect-pg-simple";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -26,6 +25,7 @@ const db = new pg.Client({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
+db.connect();
 
 app.set("trust proxy", 1);
 app.use(express.json());
@@ -187,16 +187,19 @@ app.post('/logout', (req, res, next) => {
   })
 
   app.delete("/tasks/:id", async (req,res) => {
-    const id= parseInt(req.body.id);
+    if (!req.isAuthenticated()) return res.status(401).json({ success: false });
+    const id = parseInt(req.params.id);
+    const userId = parseInt(req.user.id);
     try {
-        const task= await db.query("DELETE FROM tasks WHERE id=$1", [id])
-        res.json({success:true})
-    } catch(err) {
-        console.error(err)
+        await db.query("DELETE FROM tasks WHERE id=$1 AND user_id=$2", [id, userId]);
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false });
     }
   })
 
-  app.get("/*splat", (req, res) => {
+  app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "Task_Manager_UI/task_manager_ui/dist/index.html"));
 });
 
